@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: theme('colors.cyan.600');
+  --primary-hover: theme('colors.cyan.700');
+  --text-muted: theme('colors.slate.600');
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @theme inline {
