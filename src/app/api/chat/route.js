@@ -3,24 +3,36 @@ import OpenAI from "openai";
 import Groq from "groq-sdk";
 import { toolsSchema } from '../../../tools/schemas.js';
 
-function prepareMessagesForLLM(messages) {
-  return messages.map(m => {
-    if (m.role === 'user' && m.file?.targetLang) {
-      return {
-        role: m.role,
-        content: `${m.content?.trim() || ''}
+function findLatestUploadedDocument(messages) {
+    const latestFileMessage = [...messages].reverse().find(
+        m => m.role === 'user' && m.file?.text
+    );
+    return latestFileMessage?.file?.text || null;
+}
 
-The user uploaded a document and requested translation. If the target language hasn't been specified,
-translate into "${m.file.targetLang}".
-Use the 'translate_text' tool if appropiate.`,
-      };
-    } else {
-      return {
-        role: m.role,
-        content: m.content,
-      }
+function prepareMessagesForLLM(messages, defaultFileText = null) {
+  return messages.map(m => {
+    if (m.role === 'user') {
+        const baseContent = m.content?.trim() || '';
+        const fileText = m.file?.text || defaultFileText;
+
+        if (fileText) {
+            return {
+                role: 'user',
+                content: `${baseContent}
+            UPLOADED DOCUMENT:
+            ${fileText}`
+            };
+        }
+
+        return { role: 'user', content: baseContent};
     }
-  })
+
+    return {
+        role: m.role,
+        content: m.content
+        };
+    });
 }
 
 async function translateText(text, targetLang, userApiKey) {
@@ -80,10 +92,12 @@ export async function POST(req) {
         const systemPrompt = {
             role: "system",
             content: "You are a multilingual scientific assistant. If the user has uploaded a document \
-and mentions translation, use the 'translate_text' tool. If no text is given, assume the most recent uploaded file is available.",
+and mentions translation, use the 'translate_text' tool. If no text is given, assume the most recent uploaded file is available. \
+Otherwise, respond to the message directly, ",
         };
 
-        const finalMessages = [systemPrompt, ...prepareMessagesForLLM(messages)];
+        const latestFileText = findLatestUploadedDocument(messages);
+        const finalMessages = [systemPrompt, ...prepareMessagesForLLM(messages, latestFileText)];
 
         const completion = await groq.chat.completions.create({
             model: "qwen/qwen3-32b",
@@ -93,25 +107,18 @@ and mentions translation, use the 'translate_text' tool. If no text is given, as
         });
         const responseMessage = completion.choices[0].message;
 
+        // === TOOL HANDLING ===
         if (responseMessage.tool_calls) {
             const toolCall = responseMessage.tool_calls[0];
             const { name, arguments: args } = toolCall.function;
 
             const parsedArgs = JSON.parse(args);
 
-            let textToTranslate = parsedArgs.text;
+            let textToTranslate = parsedArgs.text || latestFileText;
             let targetLang = parsedArgs.target_lang;
 
             if (!textToTranslate) {
-                const latestFileMessage = [...messages].reverse().find(
-                    m => m.role === 'user' && m.file?.text
-                );
-
-                if (!latestFileMessage) {
-                    throw new Error("No file found to translate");
-                }
-
-                textToTranslate = latestFileMessage.file.text;
+                return NextResponse.json({ error: "No file found to translate" }, { status: 400 });
             }
 
             const translatedText = await translateText(textToTranslate, targetLang, userApiKey);
