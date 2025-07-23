@@ -32,7 +32,7 @@ export default function Home() {
               <button class="md:hidden text-slate-800">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                       stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
                   </svg>
               </button>
           </nav>
@@ -176,8 +176,8 @@ export default function Home() {
                           <div
                               class="bg-cyan-100 text-cyan-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-6">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                  stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round"
                                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                               </svg>
                           </div>
@@ -191,8 +191,8 @@ export default function Home() {
                           <div
                               class="bg-cyan-100 text-cyan-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-6">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                  stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round"
                                       d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9.5A18.034 18.034 0 0112 8.444a18.034 18.034 0 01-3.5-3.5m6.088 9.5a18.034 18.034 0 01-3.5 3.5m0 0a18.034 18.034 0 01-3.5-3.5m6.088 9.5a18.034 18.034 0 01-3.5 3.5" />
                               </svg>
                           </div>
@@ -206,8 +206,8 @@ export default function Home() {
                           <div
                               class="bg-cyan-100 text-cyan-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-6">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                  stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round"
                                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                               </svg>
                           </div>

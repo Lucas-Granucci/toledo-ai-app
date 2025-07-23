@@ -22,10 +22,12 @@ also ask me to clarify scientific concepts from the translated material.',
 
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyAlert, setShowApiKeyAlert] = useState(false);
+  const [showFilePreview, setShowFilePreview] = useState(false);
 
   const [sourceLang, setSourceLang] = useState('English');
   const [targetLang, setTargetLang] = useState('Hindi');
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [previewText, setPreviewText] = useState("");
   const fileInputRef = useRef(null);
 
 
@@ -107,7 +109,8 @@ also ask me to clarify scientific concepts from the translated material.',
 
     const assistantReply = {
       role: 'assistant',
-      content: data.response
+      content: data.response,
+      file: data.file
     }
     setMessages((prev) => [...prev, assistantReply]);
     setIsTyping(false);
@@ -118,6 +121,11 @@ also ask me to clarify scientific concepts from the translated material.',
       setUploadedFile(file);
     }
   }
+
+  const handleFilePreview = (fileText) => {
+    setPreviewText(fileText);
+    setShowFilePreview(true);
+  } 
 
   const quickActions = [
     { icon: FileText, label: 'Upload Document', action: () => fileInputRef.current?.click() },
@@ -201,7 +209,7 @@ also ask me to clarify scientific concepts from the translated material.',
                         
                         {/* File attachment for AI messages (shown below) */}
                         {m.file?.name && !isUser && (
-                          <div className="flex items-center text-sm text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
+                          <div onClick={() => handleFilePreview(m.file.text)} className="flex items-center text-sm text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
                             <FileText className="w-4 h-4 mr-2 text-slate-500" />
                             <span className="font-medium">{m.file.name}</span>
                           </div>
@@ -380,6 +388,39 @@ also ask me to clarify scientific concepts from the translated material.',
           </div>
         )}
 
+        {/* ===== FILE PREVIEW MODAL ===== */}
+        {showFilePreview && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl mx-auto">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-slate-900">File Preview</h2>
+                <button
+                  onClick={() => setShowFilePreview(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+
+              {/* Message */}
+              <p className="text-slate-700 mb-6">
+                <ReactMarkdown>{previewText}</ReactMarkdown>
+              </p>
+
+              {/* Button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowFilePreview(false)}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors"
+                >
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ===== API KEY ALERT MODAL ===== */}
         {showApiKeyAlert && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -404,7 +445,7 @@ also ask me to clarify scientific concepts from the translated material.',
               <div className="flex justify-end">
                 <button
                   onClick={() => setShowApiKeyAlert(false)}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors cursor-pointer"
                 >
                   Got it
                 </button>
