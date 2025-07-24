@@ -223,7 +223,7 @@ export default function Home() {
       {/* Footer */}
       <footer class="bg-slate-800 text-slate-400">
           <div class="container mx-auto px-6 py-8 text-center">
-              <a href="#" class="text-xl font-bold text-white">Toledo<span class="text-cyan-500">AI</span></a>
+              <a href="#" class="text-xl font-bold text-white">Toledo<span className="text-cyan-500">AI</span></a>
               <p class="mt-4 text-sm">Democratizing scientific knowledge across the globe.</p>
               <p class="mt-2 text-xs">&copy; 2025 ToledoAI. All rights reserved.</p>
           </div>
