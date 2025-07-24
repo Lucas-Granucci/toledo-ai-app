@@ -127,6 +127,38 @@ also ask me to clarify scientific concepts from the translated material.',
     setShowFilePreview(true);
   } 
 
+  const handleFileDownload = async (fileText) => {
+    try {
+      const response = await fetch('/api/download-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: fileText })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate PDF');
+      }
+
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'document.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to generate PDF: ' + error.message);
+    }
+  };
+
   const quickActions = [
     { icon: FileText, label: 'Upload Document', action: () => fileInputRef.current?.click() },
     { icon: Globe, label: 'Change Languages', action: () => setShowSettings(true) },
@@ -224,11 +256,20 @@ also ask me to clarify scientific concepts from the translated material.',
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="flex items-center gap-2 mb-2">
-                    {/* AI Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold flex-shrink-0">
-                      AI
+                    {/* AI Avatar with Spinning Border */}
+                    <div className="relative w-10 h-10 flex-shrink-0">
+                      {/* Spinning border */}
+                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400 animate-spin"></div>
+                      {/* AI Avatar */}
+                      <div className="w-full h-full rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold">
+                        AI
+                      </div>
                     </div>
-                    <span className="text-sm text-slate-500">ToledoAI is typing...</span>
+
+                    {/* Typing Text */}
+                    <div className="flex items-center">
+                      <span className="text-sm text-slate-500">ToledoAI is typing</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -391,28 +432,28 @@ also ask me to clarify scientific concepts from the translated material.',
         {/* ===== FILE PREVIEW MODAL ===== */}
         {showFilePreview && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 sticky top-0 z-10">
                 <h2 className="text-xl font-semibold text-slate-900">File Preview</h2>
                 <button
                   onClick={() => setShowFilePreview(false)}
-                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
 
               {/* Message */}
-              <p className="text-slate-700 mb-6">
+              <div className="overflow-y-auto text-slate-700 mb-6 max-h-[70vh]">
                 <ReactMarkdown>{previewText}</ReactMarkdown>
-              </p>
+              </div>
 
               {/* Button */}
-              <div className="flex justify-end">
+              <div className="flex justify-end sticky bottom-0 z-10">
                 <button
-                  onClick={() => setShowFilePreview(false)}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors"
+                  onClick={() => handleFileDownload(previewText)}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors cursor-pointer"
                 >
                   Download
                 </button>
